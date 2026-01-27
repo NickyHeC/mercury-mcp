@@ -4,10 +4,23 @@ import sys
 from dedalus_mcp import MCPServer
 
 # Import tools with error handling
+# Lambda doesn't support relative imports, so we need to use absolute imports
 try:
-    from .tools import tools
+    # Try absolute import first (for Lambda)
+    from src.tools import tools
+except ImportError:
+    # Fallback to relative import (for local development)
+    try:
+        from .tools import tools
+    except ImportError as e:
+        print(f"Error importing tools: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        tools = []
 except Exception as e:
     print(f"Error importing tools: {e}", file=sys.stderr)
+    import traceback
+    traceback.print_exc(file=sys.stderr)
     tools = []
 
 
