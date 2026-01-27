@@ -28,7 +28,7 @@ def get_api_token() -> str:
     if not token:
         raise ValueError(
             "MERCURY_API_TOKEN environment variable is not set. "
-            "Please set it in your .env file."
+            "Please set it in your deployment environment variables."
         )
     return token
 

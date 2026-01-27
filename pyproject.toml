@@ -11,4 +11,4 @@ dependencies = [
 ]
 
 [project.scripts]
-mercury-mcp = "src.main:main"
+mercury-mcp = "src.main:run"
