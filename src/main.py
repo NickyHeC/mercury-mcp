@@ -1,4 +1,3 @@
-import asyncio
 import os
 import sys
 
@@ -21,8 +20,22 @@ for tool_func in tools:
     server.collect(tool_func)
 
 
+# Lambda handler function for AWS Lambda deployment (Dedalus Labs)
+def handler(event, context):
+    """Lambda handler for Dedalus Labs deployment."""
+    try:
+        return server.handle(event, context)
+    except Exception as e:
+        print(f"Handler error: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        raise
+
+
+# For local development or non-Lambda environments
 def main() -> None:
-    """Main entry point for the MCP server."""
+    """Main entry point for the MCP server (local development)."""
+    import asyncio
     try:
         # Use port from environment variable or default to 8080
         port = int(os.getenv("PORT", "8080"))
