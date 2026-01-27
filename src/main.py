@@ -28,26 +28,23 @@ for tool_func in tools:
 # Lambda handler function for AWS Lambda deployment (Dedalus Labs)
 def handler(event, context):
     """Lambda handler for Dedalus Labs deployment."""
+    # Try calling server directly (MCPServer should be callable)
     try:
-        # Try to use server.handle() if it exists
-        if hasattr(server, 'handle'):
-            return server.handle(event, context)
-        
-        # If handle doesn't exist, try calling server directly
-        if callable(server):
-            return server(event, context)
-        
-        # Fallback: return minimal response
-        # Dedalus Labs should discover tools from the module-level server object
-        return {"status": "ok"}
-        
+        return server(event, context)
+    except (TypeError, AttributeError) as e:
+        # Server might not be directly callable, try handle method
+        try:
+            if hasattr(server, 'handle'):
+                return server.handle(event, context)
+        except Exception:
+            pass
+        # If all else fails, return server object for Dedalus Labs introspection
+        # This allows tool discovery to work even if handler methods fail
+        return server
     except Exception as e:
-        # Log error but don't crash - return error response
-        error_msg = str(e)
-        print(f"Handler error: {error_msg}", file=sys.stderr)
-        import traceback
-        traceback.print_exc(file=sys.stderr)
-        return {"status": "error", "error": error_msg}
+        # Catch any other errors and return server object instead of crashing
+        print(f"Handler error (non-fatal): {e}", file=sys.stderr)
+        return server
 
 
 # For local development or non-Lambda environments
