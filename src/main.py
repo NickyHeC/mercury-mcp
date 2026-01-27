@@ -29,19 +29,25 @@ for tool_func in tools:
 def handler(event, context):
     """Lambda handler for Dedalus Labs deployment."""
     try:
-        # Use server.handle() if available
+        # Try to use server.handle() if it exists
         if hasattr(server, 'handle'):
             return server.handle(event, context)
-        elif callable(server):
+        
+        # If handle doesn't exist, try calling server directly
+        if callable(server):
             return server(event, context)
-        else:
-            # Fallback: return server object for Dedalus Labs to introspect
-            return server
+        
+        # Fallback: return minimal response
+        # Dedalus Labs should discover tools from the module-level server object
+        return {"status": "ok"}
+        
     except Exception as e:
-        print(f"Handler error: {e}", file=sys.stderr)
+        # Log error but don't crash - return error response
+        error_msg = str(e)
+        print(f"Handler error: {error_msg}", file=sys.stderr)
         import traceback
         traceback.print_exc(file=sys.stderr)
-        raise
+        return {"status": "error", "error": error_msg}
 
 
 # For local development or non-Lambda environments
