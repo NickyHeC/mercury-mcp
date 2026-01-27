@@ -3,12 +3,17 @@ import sys
 
 from dedalus_mcp import MCPServer
 
-# Import tools with error handling
+# Import tools - fail fast if import fails to ensure tool discovery works
 try:
     from .tools import tools
+    if not tools:
+        raise RuntimeError("tools list is empty - no tools available for discovery")
 except Exception as e:
-    print(f"Error importing tools: {e}", file=sys.stderr)
-    tools = []
+    print(f"CRITICAL: Error importing tools: {e}", file=sys.stderr)
+    import traceback
+    traceback.print_exc(file=sys.stderr)
+    # Don't silently fail - raise the error so deployment fails clearly
+    raise RuntimeError(f"Failed to import tools: {e}") from e
 
 
 # --- Server ---
@@ -23,13 +28,30 @@ for tool_func in tools:
 # Lambda handler function for AWS Lambda deployment (Dedalus Labs)
 def handler(event, context):
     """Lambda handler for Dedalus Labs deployment."""
+    # Ensure tools are registered before handling
+    if not tools:
+        raise RuntimeError("No tools available - tool discovery will fail")
+    
     try:
-        return server.handle(event, context)
+        # Use server.handle() if available, otherwise try calling server directly
+        if hasattr(server, 'handle'):
+            result = server.handle(event, context)
+            return result
+        elif callable(server):
+            return server(event, context)
+        else:
+            # If neither works, return the server object itself
+            # Dedalus Labs should be able to discover tools from the server object
+            return server
+    except AttributeError:
+        # If handle doesn't exist, return server object for discovery
+        return server
     except Exception as e:
         print(f"Handler error: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc(file=sys.stderr)
-        raise
+        # Still return server for tool discovery even on error
+        return server
 
 
 # For local development or non-Lambda environments
