@@ -9,3 +9,6 @@ dependencies = [
     "requests",
     "python-dotenv",
 ]
+
+[project.scripts]
+mercury-mcp = "src.main:main"

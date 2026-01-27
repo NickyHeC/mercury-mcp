@@ -10,9 +10,14 @@ from pydantic import BaseModel
 
 # --- Configuration ---
 
-# Load environment variables from .env file
+# Load environment variables from .env file (if it exists)
+# In deployment, environment variables should be set directly
 env_path = Path(__file__).parent.parent / ".env"
-load_dotenv(dotenv_path=env_path)
+if env_path.exists():
+    load_dotenv(dotenv_path=env_path)
+else:
+    # Try to load from current directory as fallback
+    load_dotenv()
 
 MERCURY_API_BASE_URL = "https://api.mercury.com/api/v1"
 
