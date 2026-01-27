@@ -24,37 +24,15 @@ server = MCPServer(name="mercury-mcp")
 for tool_func in tools:
     server.collect(tool_func)
 
-# Verify tools are registered
-if not hasattr(server, '_tools') or len(getattr(server, '_tools', [])) == 0:
-    print(f"WARNING: No tools registered on server. Tools list: {tools}", file=sys.stderr)
-else:
-    print(f"INFO: Registered {len(tools)} tools on server", file=sys.stderr)
-
 
 # Lambda handler function for AWS Lambda deployment (Dedalus Labs)
-# Dedalus Labs expects the handler to process Lambda events and return responses
 def handler(event, context):
     """Lambda handler for Dedalus Labs deployment."""
-    # Ensure tools are registered
-    if not tools:
-        raise RuntimeError("No tools available - tool discovery will fail")
-    
-    # For tool discovery requests, Dedalus Labs might call the handler with a specific event
-    # Check if this is a discovery request
-    if isinstance(event, dict):
-        # If it's a discovery request, return tool information
-        if event.get("method") == "tools/list" or "tools" in str(event).lower():
-            # Return tools list for discovery
-            return {
-                "tools": [tool.__name__ for tool in tools],
-                "server": server
-            }
-    
-    # For regular requests, use server.handle() if available
     try:
+        # Use server.handle() if available
         if hasattr(server, 'handle'):
             return server.handle(event, context)
-        elif hasattr(server, '__call__'):
+        elif callable(server):
             return server(event, context)
         else:
             # Fallback: return server object for Dedalus Labs to introspect
@@ -63,8 +41,7 @@ def handler(event, context):
         print(f"Handler error: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc(file=sys.stderr)
-        # Return server object for tool discovery even on error
-        return server
+        raise
 
 
 # For local development or non-Lambda environments
