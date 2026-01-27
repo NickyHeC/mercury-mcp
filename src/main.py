@@ -3,17 +3,12 @@ import sys
 
 from dedalus_mcp import MCPServer
 
-# Import tools - fail fast if import fails to ensure tool discovery works
+# Import tools with error handling
 try:
     from .tools import tools
-    if not tools:
-        raise RuntimeError("tools list is empty - no tools available for discovery")
 except Exception as e:
-    print(f"CRITICAL: Error importing tools: {e}", file=sys.stderr)
-    import traceback
-    traceback.print_exc(file=sys.stderr)
-    # Don't silently fail - raise the error so deployment fails clearly
-    raise RuntimeError(f"Failed to import tools: {e}") from e
+    print(f"Error importing tools: {e}", file=sys.stderr)
+    tools = []
 
 
 # --- Server ---
@@ -28,23 +23,13 @@ for tool_func in tools:
 # Lambda handler function for AWS Lambda deployment (Dedalus Labs)
 def handler(event, context):
     """Lambda handler for Dedalus Labs deployment."""
-    # Try calling server directly (MCPServer should be callable)
     try:
-        return server(event, context)
-    except (TypeError, AttributeError) as e:
-        # Server might not be directly callable, try handle method
-        try:
-            if hasattr(server, 'handle'):
-                return server.handle(event, context)
-        except Exception:
-            pass
-        # If all else fails, return server object for Dedalus Labs introspection
-        # This allows tool discovery to work even if handler methods fail
-        return server
+        return server.handle(event, context)
     except Exception as e:
-        # Catch any other errors and return server object instead of crashing
-        print(f"Handler error (non-fatal): {e}", file=sys.stderr)
-        return server
+        print(f"Handler error: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        raise
 
 
 # For local development or non-Lambda environments
@@ -63,10 +48,6 @@ def main() -> None:
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)
 
-
-# Expose server object at module level for Dedalus Labs introspection
-# This allows Dedalus Labs to discover tools directly from the server object
-__all__ = ['server', 'handler', 'tools']
 
 if __name__ == "__main__":
     main()
