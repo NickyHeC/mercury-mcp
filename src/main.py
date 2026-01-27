@@ -1,8 +1,14 @@
 import asyncio
+from pathlib import Path
 
+from dotenv import load_dotenv
 from dedalus_mcp import MCPServer
 
 from .tools import tools
+
+# Load environment variables from .env file
+env_path = Path(__file__).parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 
 # --- Server ---

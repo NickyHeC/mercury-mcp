@@ -1,0 +1,11 @@
+[project]
+name = "mercury-mcp"
+version = "0.1.0"
+description = "MCP server for Mercury banking API"
+requires-python = ">=3.8"
+dependencies = [
+    "dedalus-mcp",
+    "pydantic",
+    "requests",
+    "python-dotenv",
+]

@@ -1,12 +1,18 @@
 import os
+from pathlib import Path
 from typing import Optional
 
 import requests
+from dotenv import load_dotenv
 from dedalus_mcp import tool
 from pydantic import BaseModel
 
 
 # --- Configuration ---
+
+# Load environment variables from .env file
+env_path = Path(__file__).parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 MERCURY_API_BASE_URL = "https://api.mercury.com/api/v1"
 
