@@ -56,9 +56,10 @@ This server uses a custom Mercury API token with the following permissions:
 
 ### Environment Variables
 
-Set the following environment variable (or add it to your `.env` file):
+Set one of the following (tools use `MERCURY_TOKEN` when set, e.g. by Dedalus DAuth, and fall back to `MERCURY_API_TOKEN` for local dev):
 
-- `MERCURY_API_TOKEN` - Your Mercury API token (format: `secret-token:mercury_production_...`)
+- `MERCURY_TOKEN` - Used by the DAuth connection and by tools when deployed (e.g. Dedalus Labs).
+- `MERCURY_API_TOKEN` - Your Mercury API token for local use (format: `secret-token:mercury_production_...`). Also works in `.env`.
 
 ## Usage
 

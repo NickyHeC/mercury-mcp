@@ -1,7 +1,21 @@
 import os
 import sys
+from pathlib import Path
 
+from dotenv import load_dotenv
 from dedalus_mcp import MCPServer
+from dedalus_mcp.auth import Connection, SecretKeys
+
+# Load environment variables from .env file
+load_dotenv()
+
+# DAuth: tools read MERCURY_TOKEN (same key) and use Basic auth for Mercury API.
+mercury_connection = Connection(
+    name="mercury",
+    secrets=SecretKeys(token="MERCURY_TOKEN"),
+    base_url="https://api.mercury.com/api/v1",
+    auth_header_format="Bearer {token}",
+)
 
 # Import tools with error handling
 # Lambda doesn't support relative imports, so we need to use absolute imports
@@ -26,7 +40,12 @@ except Exception as e:
 
 # --- Server ---
 
-server = MCPServer(name="mercury-mcp")
+server = MCPServer(
+    name="mercury-mcp", 
+    connections=[mercury_connection],
+    authorization_server=os.getenv("DEDALUS_AS_URL", "https://as.dedaluslabs.ai"),
+    streamable_http_stateless=True,
+    )
 
 # Register all tools at module level so they're available for validation
 for tool_func in tools:

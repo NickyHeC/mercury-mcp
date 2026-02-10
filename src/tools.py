@@ -23,12 +23,11 @@ MERCURY_API_BASE_URL = "https://api.mercury.com/api/v1"
 
 
 def get_api_token() -> str:
-    """Get Mercury API token from environment variable."""
-    token = os.getenv("MERCURY_API_TOKEN", "")
+    """Get Mercury API token from environment (DAuth: MERCURY_TOKEN for local)."""
+    token = os.getenv("MERCURY_TOKEN")
     if not token:
         raise ValueError(
-            "MERCURY_API_TOKEN environment variable is not set. "
-            "Please set it in your deployment environment variables."
+            "Mercury token not set. Set MERCURY_TOKEN (DAuth) in your environment."
         )
     return token
 

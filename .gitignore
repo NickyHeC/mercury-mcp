@@ -209,3 +209,7 @@ __marimo__/
 # Project-specific
 PROJECT.md
 test_balance.py
+test_investor_transfers.py
+format_investor_crm.py
+Investor CRM.csv
+Investor CRM.csv.backup
