@@ -64,16 +64,15 @@ def handler(event, context):
         raise
 
 
-# For local development or non-Lambda environments
+# For local development or deployment validation (HTTP at /mcp)
 def main() -> None:
-    """Main entry point for the MCP server (local development)."""
+    """Main entry point for the MCP server (local or container)."""
     import asyncio
     try:
-        # Use port from environment variable or default to 8080
         port = int(os.getenv("PORT", "8080"))
-        
-        # Start the server (async server.run() wrapped in asyncio.run)
-        asyncio.run(server.serve(port=port))
+        # Bind to 0.0.0.0 so deployment/validation can reach /mcp (default 127.0.0.1 is local-only)
+        host = os.getenv("HOST", "0.0.0.0")
+        asyncio.run(server.serve(host=host, port=port))
     except Exception as e:
         print(f"Server error: {e}", file=sys.stderr)
         import traceback
