@@ -14,7 +14,7 @@ mercury_connection = Connection(
     name="mercury",
     secrets=SecretKeys(token="MERCURY_TOKEN"),
     base_url="https://api.mercury.com/api/v1",
-    auth_header_format="Bearer {token}",
+    auth_header_format="Bearer {api_key}",
 )
 
 # Import tools with error handling
@@ -72,7 +72,8 @@ def main() -> None:
         port = int(os.getenv("PORT", "8080"))
         # Bind to 0.0.0.0 so deployment/validation can reach /mcp (default 127.0.0.1 is local-only)
         host = os.getenv("HOST", "0.0.0.0")
-        asyncio.run(server.serve(host=host, port=port))
+        # Match streamable_http_stateless so validation gets HTTP/SSE on /mcp
+        asyncio.run(server.serve(host=host, port=port, stateless=True))
     except Exception as e:
         print(f"Server error: {e}", file=sys.stderr)
         import traceback
