@@ -2,7 +2,7 @@
 name = "mercury-mcp"
 version = "0.1.0"
 description = "MCP server for Mercury banking API"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "dedalus-mcp",
     "pydantic",
@@ -12,3 +12,10 @@ dependencies = [
 
 [project.scripts]
 mercury-mcp = "src.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatchling.build]
+targets.wheel.packages = ["src"]

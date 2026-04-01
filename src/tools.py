@@ -1,23 +1,12 @@
 import os
-from pathlib import Path
 from typing import Optional
 
 import requests
-from dotenv import load_dotenv
 from dedalus_mcp import tool
 from pydantic import BaseModel
 
 
 # --- Configuration ---
-
-# Load environment variables from .env file (if it exists)
-# In deployment, environment variables should be set directly
-env_path = Path(__file__).parent.parent / ".env"
-if env_path.exists():
-    load_dotenv(dotenv_path=env_path)
-else:
-    # Try to load from current directory as fallback
-    load_dotenv()
 
 MERCURY_API_BASE_URL = "https://api.mercury.com/api/v1"
 
@@ -139,7 +128,7 @@ def get_account(account_id: str) -> Account:
     Returns:
         Account with detailed information
     """
-    data = make_mercury_request("GET", f"accounts/{account_id}")
+    data = make_mercury_request("GET", f"account/{account_id}")
     return Account(**data)
 
 
@@ -168,7 +157,7 @@ def get_transactions(
     
     data = make_mercury_request(
         "GET",
-        f"accounts/{account_id}/transactions",
+        f"account/{account_id}/transactions",
         params=params
     )
     

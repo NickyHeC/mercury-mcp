@@ -1,10 +1,8 @@
 # mercury-mcp
 
-A Model Context Protocol (MCP) server for interacting with Mercury banking API, built with the Dedalus Labs framework. This server provides tools to read account data and initiate payments that require admin approval.
+A Model Context Protocol (MCP) server for interacting with Mercury banking API, built with the [Dedalus Labs](https://docs.dedaluslabs.ai/dmcp) framework. This server provides tools to read account data and initiate payments that require admin approval.
 
 ## Features
-
-This MCP server provides the following capabilities:
 
 - **Read Account Data**: Retrieve account information, balances, and transaction history
 - **Payment Management**: Create payment entry templates that require admin approval
@@ -20,32 +18,37 @@ This MCP server provides the following capabilities:
 
 ## Prerequisites
 
-- Python 3.8+
+- Python 3.10+
 - A Mercury API token with appropriate permissions
 
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd mercury-mcp
 ```
 
 2. Install dependencies:
+
 ```bash
 pip install -e .
 ```
 
-3. Create a `.env` file in the project root:
+3. Set up environment variables:
+
 ```bash
-MERCURY_API_TOKEN=your-token-here
+cp .env.example .env
 ```
+
+Fill in your `MERCURY_TOKEN` value (format: `secret-token:mercury_production_...`).
 
 ## Configuration
 
 ### API Token
 
-This server uses a custom Mercury API token with the following permissions:
+This server uses a Mercury API token with the following permissions:
 - Read all available data on Mercury account
 - Initiate payments (create entry templates) that require and wait for admin approvals
 
@@ -56,14 +59,13 @@ This server uses a custom Mercury API token with the following permissions:
 
 ### Environment Variables
 
-Set one of the following (tools use `MERCURY_TOKEN` when set, e.g. by Dedalus DAuth, and fall back to `MERCURY_API_TOKEN` for local dev):
-
-- `MERCURY_TOKEN` - Used by the DAuth connection and by tools when deployed (e.g. Dedalus Labs).
-- `MERCURY_API_TOKEN` - Your Mercury API token for local use (format: `secret-token:mercury_production_...`). Also works in `.env`.
+| Variable | Description |
+|----------|-------------|
+| `MERCURY_TOKEN` | Your Mercury API token, used by the DAuth connection |
+| `DEDALUS_AS_URL` | Dedalus authorization server URL (default: `https://as.dedaluslabs.ai`) |
+| `DEDALUS_API_KEY` | Your Dedalus platform API key |
 
 ## Usage
-
-### Running the Server
 
 Start the MCP server:
 
@@ -73,18 +75,6 @@ python -m src.main
 
 The server will start on port 8080 by default.
 
-### Using the Tools
-
-The server exposes tools that can be called via the MCP protocol. Each tool is documented with its parameters and return types using Pydantic models for type safety.
-
-Example API usage (for reference):
-```python
-import requests
-
-token = 'secret-token:mercury_production_...'
-req = requests.get('https://api.mercury.com/api/v1/accounts', auth=(token, ''))
-```
-
 ## Project Structure
 
 ```
@@ -92,9 +82,10 @@ mercury-mcp/
 ├── src/
 │   ├── main.py             # Entry point and server configuration
 │   └── tools.py            # Tool definitions and implementations
-├── pyproject.toml          # Project metadata and dependencies
-├── PROJECT.md              # Platform research notes (not in git)
-└── README.md               # Project documentation
+├── pyproject.toml           # Project metadata and dependencies
+├── .env.example             # Environment variable reference
+├── LICENSE
+└── README.md
 ```
 
 ## Alternative: Mercury Hosted MCP Server
@@ -111,7 +102,3 @@ This project uses:
 ## License
 
 See LICENSE file for details.
-
-## Status
-
-[In Development]
