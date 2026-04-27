@@ -8,7 +8,7 @@ from dedalus_mcp.auth import Connection, SecretKeys
 load_dotenv()
 
 mercury_connection = Connection(
-    name="mercury",
+    name="mercury-mcp",
     secrets=SecretKeys(token="MERCURY_TOKEN"),
     base_url="https://api.mercury.com/api/v1",
     auth_header_format="Bearer {api_key}",
