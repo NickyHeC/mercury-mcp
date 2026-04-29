@@ -6,7 +6,6 @@ requires-python = ">=3.10"
 dependencies = [
     "dedalus-mcp",
     "pydantic",
-    "requests",
     "python-dotenv",
 ]
 
